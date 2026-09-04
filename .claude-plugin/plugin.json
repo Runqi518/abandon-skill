@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "abandon-skill",
+  "displayName": "Abandon Skill Anti-Slop",
+  "version": "1.0.0",
+  "description": "Bilingual anti-slop rewriting and detection driven by genre, stage, provenance, and vocabulary drift.",
+  "keywords": ["anti-slop", "humanize", "rewrite", "bilingual"]
+}
