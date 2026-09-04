@@ -2,8 +2,7 @@
 
 中文 | [English](#english)
 
-一个面向 Claude Code 的双语去 AI 腔插件。它不判断“是不是 AI 写的”，而是
-定位并修复可观察的模板化表达。设计由四个维度驱动：
+一个面向 Claude Code 的双语去 AI 腔插件，定位并修复可观察的模板化表达。设计由四个维度驱动：
 
 - **场景**：小红书、PRD/技术文档、周报、Commit/PR、邮件。
 - **环节**：写前 prompt-audit、写后 rewrite/report/score；写中 guard 留待阶段二。
