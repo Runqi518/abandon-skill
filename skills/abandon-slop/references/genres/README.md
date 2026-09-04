@@ -12,7 +12,7 @@ the strongest path or content signal; if confidence is low, use no profile.
 | `email` | `.eml`, `mail`, `email` | subject, 收件人, Hi, Dear, Regards |
 
 Each profile may define `terms`, `regex`, and `allow` blocks from
-`shared/spec.md`. Genre rules merge after the language base. Profile allow
+`../spec.md`. Genre rules merge after the language base. Profile allow
 entries override both base and genre tells. Keep bilingual entries together.
 
 Profiles should contain only genre-specific evidence. General-purpose rules

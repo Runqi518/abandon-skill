@@ -1,6 +1,6 @@
 # 中文通用底盘 / Chinese Base Tells
 
-机器记录格式见 `shared/spec.md`。只有标记块由引擎读取；其余文字供改写时参考。
+机器记录格式见 `spec.md`。只有标记块由引擎读取；其余文字供改写时参考。
 
 <!-- abandon:terms -->
 zh-001|meta|medium|prior|值得注意的是

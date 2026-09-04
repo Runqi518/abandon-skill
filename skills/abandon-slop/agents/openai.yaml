@@ -1,0 +1,8 @@
+interface:
+  display_name: "Abandon Skill"
+  short_description: "Detect and remove AI-slop patterns in Chinese or English."
+  brand_color: "#2D5B4F"
+  default_prompt: "Use $abandon-slop to rewrite this text without changing its meaning."
+
+policy:
+  allow_implicit_invocation: true

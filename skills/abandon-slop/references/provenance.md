@@ -2,7 +2,7 @@
 
 Labels estimate where a tell may have entered the text. They do not identify an
 author or prove that AI was used. Prefer cautious wording when evidence is
-weak, while machine findings use the three labels in `shared/spec.md`.
+weak, while machine findings use the three labels in `spec.md`.
 
 ## Model-Prior Fingerprints
 

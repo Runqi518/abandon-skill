@@ -1,10 +1,14 @@
 # Vocabulary Drift / 词表漂移
 
-Teach mode stores user-specific drift outside the plugin so upgrades do not
-overwrite it:
+Teach mode stores user-specific drift outside the skill so upgrades do not
+overwrite it. The cross-platform default is:
 
-- `~/.claude/config/abandon-slop/teach-vocabulary.md`
-- `~/.claude/config/abandon-slop/teach-allow-list.md`
+- `~/.config/abandon-slop/teach-vocabulary.md`
+- `~/.config/abandon-slop/teach-allow-list.md`
+
+Set `ABANDON_SLOP_CONFIG_DIR` to override the directory. Existing files under
+`~/.claude/config/abandon-slop/` remain readable for backward compatibility;
+new mutations are written to the cross-platform directory.
 
 ## File Format
 
@@ -18,10 +22,10 @@ values and values containing a newline or `|` are rejected. UTF-8 is required.
 ## Commands
 
 ```bash
-python3 shared/slop_count.py --teach-add "这个词也是 slop"
-python3 shared/slop_count.py --allow-add "这个词别再标"
-python3 shared/slop_count.py --teach-remove "旧词"
-python3 shared/slop_count.py --allow-remove "旧豁免"
+python3 scripts/slop_count.py --teach-add "这个词也是 slop"
+python3 scripts/slop_count.py --allow-add "这个词别再标"
+python3 scripts/slop_count.py --teach-remove "旧词"
+python3 scripts/slop_count.py --allow-remove "旧豁免"
 ```
 
 Mutation is atomic: write a sibling temporary file, flush and `fsync`, then

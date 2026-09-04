@@ -13,9 +13,10 @@ import unicodedata
 from collections import Counter
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-REF = ROOT / "skills" / "abandon-slop" / "references"
-USER_DIR = Path.home() / ".claude" / "config" / "abandon-slop"
+SKILL_ROOT = Path(__file__).resolve().parent.parent
+REF = SKILL_ROOT / "references"
+LEGACY_USER_DIR = Path.home() / ".claude" / "config" / "abandon-slop"
+USER_DIR = Path(os.environ.get("ABANDON_SLOP_CONFIG_DIR", Path.home() / ".config" / "abandon-slop")).expanduser()
 TEACH = USER_DIR / "teach-vocabulary.md"
 ALLOW = USER_DIR / "teach-allow-list.md"
 SEVERITY = {"low": 1, "medium": 2, "high": 3}
@@ -54,7 +55,7 @@ def parse_rules(path: Path, block: str) -> list[dict]:
             raise ValueError(f"invalid provenance in {path}: {line}")
         rules.append({"id": parts[0], "category": parts[1], "severity": parts[2],
                       "provenance": prov, "pattern": parts[4], "regex": block == "regex",
-                      "source": str(path.relative_to(ROOT)) if path.is_relative_to(ROOT) else str(path)})
+                      "source": str(path.relative_to(SKILL_ROOT)) if path.is_relative_to(SKILL_ROOT) else str(path)})
     return rules
 
 
@@ -72,10 +73,15 @@ def sources(lang: str, genre: str | None) -> list[Path]:
     if lang in {"en", "mixed"}:
         paths.append(REF / "tells-en.md")
     if genre:
+        if not re.fullmatch(r"[a-z0-9-]+", genre):
+            raise ValueError(f"invalid genre name: {genre}")
         candidate = REF / "genres" / f"{genre}.md"
         if not candidate.exists():
             raise ValueError(f"unknown genre: {genre}")
         paths.append(candidate)
+    legacy_teach = LEGACY_USER_DIR / "teach-vocabulary.md"
+    if legacy_teach != TEACH:
+        paths.append(legacy_teach)
     paths.append(TEACH)
     return paths
 
@@ -88,6 +94,9 @@ def merged_rules(paths: list[Path]) -> tuple[list[dict], list[str]]:
             key = ("regex" if rule["regex"] else "literal", norm(rule["pattern"]))
             merged[key] = rule
         allows.extend(block_lines(path, "allow"))
+    legacy_allow = LEGACY_USER_DIR / "teach-allow-list.md"
+    if legacy_allow != ALLOW:
+        allows.extend(block_lines(legacy_allow, "allow"))
     allows.extend(block_lines(ALLOW, "allow"))
     return list(merged.values()), list(dict.fromkeys(norm(a) for a in allows if norm(a)))
 
@@ -150,7 +159,7 @@ def analyze(text: str, genre: str | None, forced_lang: str | None, prompt: str) 
                 "rule_id": "paragraph-cooccurrence", "category": "structure", "severity": "high",
                 "paragraph": para_no, "line": text.count("\n", 0, start) + 1,
                 "quote": stripped[:120], "start": start, "end": start + min(120, len(stripped)),
-                "provenance": ["prior"], "source": "shared/spec.md",
+                "provenance": ["prior"], "source": "references/spec.md",
             })
     unique = {(f["rule_id"], f["paragraph"], f["start"], f["end"]): f for f in findings}
     findings = sorted(unique.values(), key=lambda f: (f["start"], f["end"], f["rule_id"]))
@@ -201,7 +210,7 @@ def main() -> int:
     source = parser.add_mutually_exclusive_group()
     source.add_argument("--file", type=Path)
     source.add_argument("--text")
-    parser.add_argument("--genre", choices=["xiaohongshu", "doc-prd", "weekly-report", "commit-pr", "email"])
+    parser.add_argument("--genre", help="profile filename under references/genres, without .md")
     parser.add_argument("--lang", choices=["zh", "en", "mixed"])
     parser.add_argument("--prompt-file", type=Path)
     actions = parser.add_mutually_exclusive_group()

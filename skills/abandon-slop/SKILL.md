@@ -1,10 +1,11 @@
 ---
 name: abandon-slop
 description: Detects and removes AI slop in Chinese or English writing using genre, writing stage, provenance, and personal vocabulary drift. Use when the user says 去去AI味、去 AI 味、humanize、less AI、哪里有AI味、flag the slop、AI味重吗、能发吗, asks whether a prompt will produce AI-like prose, or teaches phrases to flag or allow.
-compatibility: Requires Python 3 for deterministic scoring and teach persistence.
+compatibility: Works with Agent Skills clients including Claude Code, Codex, ChatGPT, and OpenCode; Python 3 enables deterministic scoring and teach persistence.
 metadata:
   display-name: Abandon Skill
   display-name-zh: 摒弃 AI 腔
+  version: "1.1.0"
 ---
 
 # Abandon Skill / 摒弃 AI 腔
@@ -14,17 +15,18 @@ Treat provenance as a hypothesis, never proof that a model wrote the text.
 
 ## Locate Resources
 
-Resolve all paths from `${CLAUDE_PLUGIN_ROOT}`:
+Set `SKILL_ROOT` to the directory containing this `SKILL.md`. Resolve every
+resource relative to it; do not assume a particular host or working directory:
 
-- Contract: `shared/spec.md`
-- Engine: `shared/slop_count.py`
-- Drift rules: `shared/drift.md`
-- General rules: `skills/abandon-slop/references/tells-zh.md` and `tells-en.md`
-- Genres: `skills/abandon-slop/references/genres/README.md`
-- Provenance: `skills/abandon-slop/references/provenance.md`
-- Prompt audit: `skills/abandon-slop/references/prompt-audit.md`
+- Contract: `references/spec.md`
+- Engine: `scripts/slop_count.py`
+- Drift rules: `references/drift.md`
+- General rules: `references/tells-zh.md` and `references/tells-en.md`
+- Genres: `references/genres/README.md`
+- Provenance: `references/provenance.md`
+- Prompt audit: `references/prompt-audit.md`
 
-Read `shared/spec.md` first. Load only the references required by the selected
+Read `references/spec.md` first. Load only references required by the selected
 mode, detected language, and one genre. Do not load every profile.
 
 ## Select One Mode
@@ -54,13 +56,18 @@ If it asks only for diagnosis, do not rewrite. If ambiguous, default to
 For `report`, `score`, and pre-rewrite diagnosis, run:
 
 ```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/shared/slop_count.py" --file INPUT [--genre GENRE]
+python3 "<SKILL_ROOT>/scripts/slop_count.py" --file INPUT [--genre GENRE]
 ```
 
 For prompt-aware provenance, save the prompt separately and append
 `--prompt-file PROMPT`. The JSON is stable and authoritative for deterministic
 matches. Add a semantic finding only when you can quote exact text and map it
-to a category in `shared/spec.md`.
+to a category in `references/spec.md`.
+
+If the host cannot execute Python, `rewrite`, `report`, and `prompt-audit` may
+continue from the loaded references. Do not fabricate deterministic counts:
+state that `score` requires Python 3. `teach` requires local file and Python
+access; explain that limitation instead of pretending persistence succeeded.
 
 ## Rewrite
 
@@ -123,8 +130,8 @@ allow this phrase” as an exemption. If the exact phrase is unclear, ask for it
 Otherwise call exactly one engine mutation:
 
 ```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/shared/slop_count.py" --teach-add "PHRASE"
-python3 "${CLAUDE_PLUGIN_ROOT}/shared/slop_count.py" --allow-add "PHRASE"
+python3 "<SKILL_ROOT>/scripts/slop_count.py" --teach-add "PHRASE"
+python3 "<SKILL_ROOT>/scripts/slop_count.py" --allow-add "PHRASE"
 ```
 
 Optional tell metadata: `--category`, `--severity`, `--provenance`. Use defaults

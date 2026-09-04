@@ -44,8 +44,9 @@ The selected genre profile always loads and may contain both languages.
 
 1. General language base.
 2. One selected genre profile.
-3. Personal `teach-vocabulary.md`.
-4. Personal `teach-allow-list.md`, which always wins.
+3. Legacy Claude-specific personal vocabulary, when present.
+4. Cross-platform personal `teach-vocabulary.md`.
+5. Personal `teach-allow-list.md`, which always wins.
 
 Rules are deduplicated by normalized literal or regex pattern. Later metadata
 replaces earlier metadata. Allow entries suppress literal and regex findings
